@@ -1,0 +1,12 @@
+---
+schemaVersion: '2.2'
+description: see if kernel has been updated and a reboot is necessary
+parameters: {}
+mainSteps:
+- action: aws:runShellScript
+  name: InstallAppSupportAppsBashScript
+  inputs:
+    runCommand:
+    - 'aws s3 cp s3://location/pendingcorelibupdate.sh /tmp/ --region us-gov-west-1'
+    - 'aws s3 cp s3://location/reboot_manifest.csv  /tmp/ --region us-gov-west'
+    - 'sudo bash /tmp/pendingcorelibupdate.sh' >> /tmp/reboot_manifest.csv
