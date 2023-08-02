@@ -1,0 +1,38 @@
+
+
+#checking for registery items
+
+$registryPath = HKLM:\SYSTEM\CurrentControlSet\Control\DeviceGuard
+IF(!(Test-Path $registryPath))
+
+Set-ItemProperty -Path HKLM:\SYSTEM\CurrentControlSet\Control\DeviceGuard -Name HypervisorEnforcedCodeIntegrity 
+Set-ItemProperty -Path HKLM:\SYSTEM\CurrentControlSet\Control\DeviceGuard -Name HypervisorEnforcedCodeIntegrity
+
+
+$defend = Get-Item -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender\Exclusions'
+
+if($defend.GetValue("Default") -eq $null){
+
+    echo "yes"
+    New-ItemProperty -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender' -Name "DisableRoutinelyTakingAction" -Value 0
+    }
+
+
+
+#Test to see if reg path exists.
+try {$exclusions = Get-Item -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender\Exclusions'}
+catch {
+    New-Item -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender\' -Value 'Exclusions'
+    $exclusions = Get-Item -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender\Exclusions'
+}
+
+
+if((Test-Path $exclusions) -eq $true){
+    if($exclusions.getvalue("Exclusions_Processes") -eq $null){
+
+    echo "yes"
+    New-ItemProperty -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender\' -Name "Exclusions_Processes"
+    }
+  }
+  try{ New-ItemProperty -Path $exclusions -Name "Exclusions_Processes" -Value 0 }
+  Catch{ 'Already Exists' }
